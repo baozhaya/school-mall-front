@@ -20,7 +20,7 @@
             style="border: none"
             :default-active="router.currentRoute.value.path"
             :default-openeds="['user']"
-        >
+        >//创建菜单
           <el-menu-item index="/manager/home">
             <el-icon><HomeFilled /></el-icon>
             <span>系统首页</span>
@@ -30,6 +30,10 @@
               <el-icon><User /></el-icon>
               <span>用户管理</span>
             </template>
+            <el-menu-item index="/manager/user">
+              <el-icon><User /></el-icon>
+              <span>普通用户</span>
+            </el-menu-item>
             <el-menu-item index="/manager/admin">
               <el-icon><User /></el-icon>
               <span>管理员信息</span>
