@@ -45,6 +45,7 @@ const load=() =>{
     params:{
       pageNum:date.pageNum,
       pageSize:date.pageSize,
+      name:date.name,
     }
   }).then(res=>{
     if (res.code == '200'){
@@ -58,6 +59,7 @@ const load=() =>{
 }
 load()
 const reset=()=>{
-
+date.name='null'
+load()
 }
 </script>
