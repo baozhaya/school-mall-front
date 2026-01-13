@@ -19,12 +19,22 @@
             router
             style="border: none"
             :default-active="router.currentRoute.value.path"
-            :default-openeds="['user']"
+            :default-openeds="['user','info']"
         >//创建菜单
           <el-menu-item index="/manager/home">
             <el-icon><HomeFilled /></el-icon>
             <span>系统首页</span>
           </el-menu-item>
+          <el-sub-menu index="info">
+            <template #title>
+                <el-icon><Memo/></el-icon>
+              <span>信息管理</span>
+            </template>
+            <el-menu-item index="/manager/contegory">
+              <el-icon><Document /></el-icon>
+              <span>商品分类</span>
+            </el-menu-item>
+          </el-sub-menu>
           <el-sub-menu index="user">
             <template #title>
               <el-icon><User /></el-icon>
@@ -39,6 +49,14 @@
               <span>管理员信息</span>
             </el-menu-item>
           </el-sub-menu>
+          <el-menu-item index="/manager/perosn">
+            <el-icon><User/></el-icon>
+            <span>个人信息 </span>
+          </el-menu-item>
+          <el-menu-item index="/manager/password">
+            <el-icon><Lock/></el-icon>
+            <span>修改密码 </span>
+          </el-menu-item>
           <el-menu-item @click="logout">
             <el-icon><SwitchButton /></el-icon>
             <span>退出系统</span>
@@ -74,7 +92,7 @@ const updateUser = () => {
 const logout = () => {
   router.push('/login')
   ElMessage.success('退出成功')
-  localStorage.removeItem('code2026-user')
+  localStorage.removeItem('system-user')
 }
 </script>
 
