@@ -53,8 +53,8 @@ const emit = defineEmits(["updateUser"]);
   })
 
   const loadUser = () => {
-    request.get('user/selectById'+data.user.id).then(res=>{
-      data.user = res.data
+    request.get('user/selectById'+date.user.id).then(res=>{
+      date.user = res.data
       //存储最新的用户信息
       loadStorage.setItem('system-user',JSON.stringify(res.data.user))
       emit('updateUser')

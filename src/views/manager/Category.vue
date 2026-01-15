@@ -1,7 +1,6 @@
 <template>
   <div>
-
-    <div class="card" style="margin-bottom: 5px;">
+    <div class="card" style="margin-bottom: 10px;">
       <el-input v-model="data.name" style="width: 300px; margin-right: 10px" placeholder="请输入名称查询"></el-input>
       <el-button type="primary" @click="load">查询</el-button>
       <el-button type="info" style="margin: 0 10px" @click="reset">重置</el-button>
@@ -12,14 +11,7 @@
         <el-button type="primary" @click="handleAdd">新增</el-button>
       </div>
       <el-table :data="data.tableData" stripe>
-        <el-table-column label="用户名" prop="username"></el-table-column>
         <el-table-column label="名称" prop="name"></el-table-column>
-        <el-table-column label="头像">
-          <template #default="scope">
-            <el-image  v-if="scope.row.avatar" :src="scope.row.avatar" :preview-src-list="[scope.row.avatar]" preview-teleported style="width: 40px; height: 40px; border-radius: 50%"></el-image>
-          </template>
-        </el-table-column>
-        <el-table-column label="角色" prop="role"></el-table-column>
         <el-table-column label="操作" align="center" width="160">
           <template #default="scope">
             <el-button type="primary" @click="handleEdit(scope.row)">编辑</el-button>
@@ -30,19 +22,11 @@
     </div>
 
     <div class="card">
-      <el-pagination background layout="total,prev, pager, next"v-model:page-size="data.pageSize" v-model:current-page="data.pageNum" :total="data.total"/>
+      <el-pagination @current-change="load" background layout="total, prev, pager, next" v-model:page-size="data.pageSize" v-model:current-page="data.pageNum" :total="data.total"/>
     </div>
 
-    <el-dialog title="信息" width="30%" v-model="data.formVisible" :close-on-click-modal="false" destroy-on-close>
-      <el-form :model="data.form" label-width="80px" style="padding-right: 30px">
-        <el-form-item label="头像" prop="avatar">
-          <el-upload :action="uploadUrl" list-type="picture" :on-success="handleImgSuccess">
-            <el-button type="primary">上传图片</el-button>
-          </el-upload>
-        </el-form-item>
-        <el-form-item label="账号" prop="username">
-          <el-input :disabled="data.form.id" v-model="data.form.username" autocomplete="off" />
-        </el-form-item>
+    <el-dialog title="商品分类信息" width="30%" v-model="data.formVisible" :close-on-click-modal="false" destroy-on-close>
+      <el-form ref="formRef" :model="data.form" :rules="data.rules" label-width="80px" style="padding-right: 30px; padding-top: 20px">
         <el-form-item label="名称" prop="name">
           <el-input v-model="data.form.name" autocomplete="off" />
         </el-form-item>
@@ -60,12 +44,10 @@
 
 <script setup>
 import request from "@/utils/request";
-import {reactive} from "vue";
+import {reactive, ref} from "vue";
 import {ElMessageBox, ElMessage} from "element-plus";
 
-// 文件上传的接口地址
-const uploadUrl = import.meta.env.VITE_BASE_URL + '/files/upload'
-
+const formRef = ref()
 const data = reactive({
   pageNum: 1,
   pageSize: 10,
@@ -73,12 +55,17 @@ const data = reactive({
   formVisible: false,
   form: {},
   tableData: [],
-  name: null
+  name: null,
+  rules: {
+    name: [
+      { required: true, message: '请输入名称', trigger: 'blur' },
+    ]
+  }
 })
 
 // 分页查询
 const load = () => {
-  request.get('/admin/selectPage', {
+  request.get('/category/selectPage', {
     params: {
       pageNum: data.pageNum,
       pageSize: data.pageSize,
@@ -89,6 +76,7 @@ const load = () => {
     data.total = res.data?.total
   })
 }
+load()
 
 // 新增
 const handleAdd = () => {
@@ -104,7 +92,7 @@ const handleEdit = (row) => {
 
 // 新增保存
 const add = () => {
-  request.post('/admin/add', data.form).then(res => {
+  request.post('/category/add', data.form).then(res => {
     if (res.code === '200') {
       load()
       ElMessage.success('操作成功')
@@ -117,7 +105,7 @@ const add = () => {
 
 // 编辑保存
 const update = () => {
-  request.put('/admin/update', data.form).then(res => {
+  request.put('/category/update', data.form).then(res => {
     if (res.code === '200') {
       load()
       ElMessage.success('操作成功')
@@ -130,14 +118,18 @@ const update = () => {
 
 // 弹窗保存
 const save = () => {
-  // data.form有id就是更新，没有就是新增
-  data.form.id ? update() : add()
+  formRef.value.validate(valid => {
+    if (valid) {
+      // data.form有id就是更新，没有就是新增
+      data.form.id ? update() : add()
+    }
+  })
 }
 
 // 删除
 const handleDelete = (id) => {
   ElMessageBox.confirm('删除后数据无法恢复，您确定删除吗?', '删除确认', { type: 'warning' }).then(res => {
-    request.delete('/admin/delete/' + id).then(res => {
+    request.delete('/category/delete/' + id).then(res => {
       if (res.code === '200') {
         load()
         ElMessage.success('操作成功')
@@ -153,11 +145,4 @@ const reset = () => {
   data.name = null
   load()
 }
-
-// 处理文件上传的钩子
-const handleImgSuccess = (res) => {
-  data.form.avatar = res.data  // res.data就是文件上传返回的文件路径，获取到路径后赋值表单的属性
-}
-
-load()
 </script>
